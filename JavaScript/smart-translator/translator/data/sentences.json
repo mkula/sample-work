@@ -1,0 +1,45 @@
+[
+  {
+    "trans":"nadawanie",
+    "orig":"broadcast",
+    "backend":2
+  },
+  {
+    "src_translit":"ˈbrôdˌkast"
+  }
+]
+
+=====================================
+
+[
+  {
+    "trans":"Scientific Detective Monthly był magazynem na temat miazgi opublikowanym przez Hugo Gernsback'a, który ukazał się po raz pierwszy w styczniu 1930 roku. Jego celem było skupienie się na opowieściach detektywistycznych i tajemniczych z naukowym elementem, ale w każdym numerze były też jedno lub dwa opowiadania science fiction. ",
+    "orig":"Scientific Detective Monthly was a pulp magazine published by Hugo Gernsback, first appearing in January 1930. It was intended to focus on detective and mystery stories with a scientific element, but there were also one or two science fiction stories in every issue.",
+    "backend":3
+  },
+  {
+    "trans":"Tytuł zmieniono na Amazing Detective Tales w wydaniu z czerwca 1930 r., Być może aby uniknąć słowa „naukowy”, które mogło dać czytelnikom wrażenie „pewnego rodzaju czasopisma naukowego”, według słów Gernsbacka, a nie czasopisma przeznaczonego do rozrywki ",
+    "orig":"The title was changed to Amazing Detective Tales with the June 1930 issue, perhaps to avoid the word \"scientific\", which may have given readers the impression of \"a sort of scientific periodical\", in Gernsback's words, rather than a magazine intended to entertain",
+    "backend":3
+  },
+  {
+    "trans":". ",
+    "orig":".",
+    "backend":3
+  },
+  {
+    "trans":"W tym samym czasie edytor - Hector Gray - został zastąpiony przez Davida Lassera, który już edytował inne czasopisma science fiction Gernsback. ",
+    "orig":"At the same time, the editor—Hector Grey—was replaced by David Lasser, who was already editing Gernsback's other science fiction magazines.",
+    "backend":3
+  },
+  {
+    "trans":"Zmiana tytułu najwyraźniej nie przyczyniła się do sukcesu magazynu, a Gernsback zamknął go w październiku po wydaniu 10 numerów. ",
+    "orig":"The title change apparently did not make the magazine a success, and Gernsback closed it down in October after releasing 10 issues.",
+    "backend":3
+  },
+  {
+    "trans":"Sprzedał tytuł wydawcy Wallace'owi Bamberowi, który wyprodukował co najmniej pięć kolejnych numerów w 1931 roku pod tytułem Amazing Detective Stories.",
+    "orig":"He sold the title to publisher Wallace Bamber, who produced at least five more issues in 1931 under the title Amazing Detective Stories.",
+    "backend":3
+  }
+]

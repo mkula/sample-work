@@ -1,2 +1,2 @@
 # SampleWork
-Repo to showcase some of my work
+Repo showcasing some of my work

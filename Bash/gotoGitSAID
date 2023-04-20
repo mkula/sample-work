@@ -1,0 +1,45 @@
+#!/bin/sh
+
+## This script simulates functionality of gotoSAID on TTB
+## But it changes directory to its git client repo equivalent 
+user=$(whoami)
+
+if [ "X$1" == "X" ]
+then
+  echo "Usage: gotoSAID <saname>"
+  exit 1
+fi
+
+git_path="/data/home/${user}/git/client/"
+
+cd $git_path
+
+exit 0
+
+index=0
+client_list=( )
+IFS=$'\n'
+for said_saname in $(tx saname_said $1)
+do
+  let  "index++"
+  echo "$index. $said_saname"  # present option to user
+  client_list[$index]=${said_saname%%->*}  # add said to array
+done
+
+client_selection=0
+until [ "$client_selection" -gt 0 ] && [ "$client_selection" -lt "${#client_list[@]}" ]
+do
+  printf "Select a choice above: "
+  read client_selection
+done
+
+git_path="/data/home/${user}/git/client/${client_list[$client_selection]}/"
+
+if [ -d $git_path ]
+then
+  cd $git_path
+else
+  echo "$git_path doesn't exist"
+fi
+
+exit 0

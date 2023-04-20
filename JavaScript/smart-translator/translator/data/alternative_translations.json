@@ -1,0 +1,79 @@
+[
+  {
+    "src_phrase":"broadcast",
+    "alternative":[
+      {
+        "word_postproc":"nadawanie",
+        "score":1000,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      },
+      {
+        "word_postproc":"transmisja",
+        "score":1000,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      },
+      {
+        "word_postproc":"transmitować",
+        "score":1000,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      },
+      {
+        "word_postproc":"rozgłaszać",
+        "score":1000,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      },
+      {
+        "word_postproc":"nadać przez radio",
+        "score":1000,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      }
+    ],
+    "srcunicodeoffsets":[
+      {
+        "begin":0,
+        "end":9
+      }
+    ],
+    "raw_src_segment":"broadcast",
+    "start_pos":0,
+    "end_pos":0
+  }
+]
+
+==============================================
+
+[
+  {
+    "src_phrase":"Scientific Detective Monthly was a pulp magazine published by Hugo Gernsback, first appearing in January 1930. It was intended to focus on detective and mystery stories with a scientific element, but there were also one or two science fiction stories in every issue.",
+    "alternative":[
+      {
+        "word_postproc":"Scientific Detective Monthly był magazynem na temat miazgi opublikowanym przez Hugo Gernsback'a, który ukazał się po raz pierwszy w styczniu 1930 roku. Jego celem było skupienie się na opowieściach detektywistycznych i tajemniczych z naukowym elementem, ale w każdym numerze były też jedno lub dwa opowiadania science fiction.",
+        "score":0,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      },
+      {
+        "word_postproc":"Detektyw Scientific Monthly był pulp magazine opublikowane przez Hugo Gernsback, po raz pierwszy pojawił się w styczniu 1930. Jej celem było skupienie się na detektywistycznych i tajemnica historie z elementem naukowego, ale były też jedna lub dwie historie science fiction w każdym numerze.",
+        "score":0,
+        "has_preceding_space":true,
+        "attach_to_next_token":false
+      }
+    ],
+    "srcunicodeoffsets":[
+      {
+        "begin":0,
+        "end":266
+      }
+    ],
+    "raw_src_segment":"Scientific Detective Monthly was a pulp magazine published by Hugo Gernsback, first appearing in January 1930. It was intended to focus on detective and mystery stories with a scientific element, but there were also one or two science fiction stories in every issue.",
+    "start_pos":0,
+    "end_pos":0
+  }
+]
+
+

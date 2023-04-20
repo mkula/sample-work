@@ -1,0 +1,123 @@
+[
+  {
+    "pos":"adjective",
+    "entry":[
+      {
+        "synonym":["cathartic"],
+        "definition_id":""
+      }
+    ],
+    "base_form":"releasing"
+  },
+  {
+    "pos":"verb",
+    "entry":[
+      {
+        "synonym":["free","set free","let go/out","allow to leave","liberate","set at liberty","manumit"],
+        "definition_id":"m_en_us1284085.001"
+      },
+      {
+        "synonym":["untie","undo","loose","let go","unleash","unfetter"],
+        "definition_id":"m_en_us1284085.001"
+      },
+      {
+        "synonym":["make available","free","free up","put at someone's disposal","supply","furnish","provide"],
+        "definition_id":"m_en_us1284085.002"
+      },
+      {
+        "synonym":["excuse","exempt","discharge","deliver","absolve","let off"],
+        "definition_id":"m_en_us1284085.008"
+      },
+      {
+        "synonym":["make public","make known","issue","break","announce","declare","report","reveal","divulge","disclose","publish","broadcast","circulate","communicate","disseminate"],
+        "definition_id":"m_en_us1284085.003"
+      },
+      {
+        "synonym":["launch","put on the market","put on sale","bring out","make available"],
+        "definition_id":"m_en_us1284085.004"
+      },
+      {
+        "synonym":["free","resign","relinquish","give up"],
+        "definition_id":""
+      },
+      {
+        "synonym":["let go of","let go","relinquish"],
+        "definition_id":""
+      },
+      {
+        "synonym":["unloose","liberate","free","unloosen","loose"],
+        "definition_id":""
+      },
+      {
+        "synonym":["publish","put out","bring out","issue"],
+        "definition_id":""
+      },
+      {
+        "synonym":["free","unblock","unfreeze"],
+        "definition_id":""
+      },
+      {
+        "synonym":["free"],
+        "definition_id":""
+      },
+      {
+        "synonym":["turn"],
+        "definition_id":""
+      },
+      {
+        "synonym":["secrete"],
+        "definition_id":""
+      },
+      {
+        "synonym":["exhaust","expel","eject","discharge"],
+        "definition_id":""
+      },
+      {
+        "synonym":["liberate","free"],
+        "definition_id":""
+      }
+    ],
+    "base_form":"release"
+  }
+]
+
+====================================================
+
+[
+  {
+    "pos":"noun",
+    "entry":[
+      {
+        "synonym":["program","show","production","transmission","telecast","webcast","simulcast","screening"],
+        "definition_id":"m_en_us1228872.005"
+      },
+      {
+        "synonym":["program"],
+        "definition_id":""
+      }
+    ],
+    "base_form":"broadcast"
+  },
+  {
+    "pos":"verb",
+    "entry":[
+      {
+        "synonym":["transmit","relay","air","beam","show","televise","telecast","webcast","simulcast","cablecast","screen"],
+        "definition_id":"m_en_us1228872.001"
+      },
+      {
+        "synonym":["report","announce","publicize","proclaim","spread","disseminate","scatter","circulate","air","blazon","trumpet"],
+        "definition_id":"m_en_us1228872.003"
+      },
+      {
+        "synonym":["transmit","beam","send","air"],
+        "definition_id":""
+      },
+      {
+        "synonym":["diffuse","disperse","propagate","circulate","disseminate","pass around","circularize","spread","distribute","circularise"],
+        "definition_id":""
+      }
+    ],
+    "base_form":"broadcast"
+  }
+]

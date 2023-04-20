@@ -1,0 +1,81 @@
+[
+  {
+    "pos":"noun",
+    "terms":["zwalnianie","wypuszczenie"],
+    "entry":[
+      {
+        "word":"zwalnianie",
+        "reverse_translation":["releasing","dismissal","relaxation","exemption"],
+        "score":0.034756977,
+        "gender":3
+      },
+      {
+        "word":"wypuszczenie",
+        "reverse_translation":["releasing","release","discharge","emission","relinquishment","issue"],
+        "score":0.0025574362,
+        "gender":3
+      }
+    ],
+    "base_form":"releasing",
+    "pos_enum":1
+  }
+]
+
+================================================
+
+[
+  {
+    "pos":"noun",
+    "terms":["nadawanie","transmisja","audycja radiowa"],
+    "entry":[
+      {
+        "word":"nadawanie",
+        "reverse_translation":["broadcast","transmission"],
+        "score":0.04063502,
+        "gender":3
+      },
+      {
+        "word":"transmisja",
+        "reverse_translation":["transmission","broadcast","program","belting","drive","programme"],
+        "score":0.033687614,
+        "gender":2
+      },
+      {
+        "word":"audycja radiowa",
+        "reverse_translation":["broadcast"],
+        "score":0.000063031563,
+        "gender":2
+      }
+    ],
+    "base_form":"broadcast",
+    "pos_enum":1
+  },
+  {
+    "pos":"verb",
+    "terms":["transmitować","rozgłaszać","nadać przez radio","siać rzutowo"],
+    "entry":[
+      {
+        "word":"transmitować",
+        "reverse_translation":["transmit","broadcast","air"],
+        "score":0.010767208
+      },
+      {
+        "word":"rozgłaszać",
+        "reverse_translation":["broadcast","divulge","trumpet"],
+        "score":0.0025574362
+      },
+      {
+        "word":"nadać przez radio",
+        "reverse_translation":["broadcast"],
+        "score":0.00015600461
+      },
+      {
+        "word":"siać rzutowo",
+        "reverse_translation":["broadcast"],
+        "score":0.000063031563
+      }
+    ],
+    "base_form":"broadcast",
+    "pos_enum":2
+  }
+]

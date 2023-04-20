@@ -1,0 +1,702 @@
+//@version=4
+study("*Bullish Candlestick Patterns*", shorttitle="Bullish Candlesticks", overlay=true)
+
+
+isUpTrend   = true
+isDownTrend = true
+
+var trendRuleEMA8   = "EMA8"
+var trendRuleEMA12  = "EMA12"
+var trendRuleEMA26  = "EMA26"
+var trendRuleSMA10  = "SMA10"
+var trendRuleSMA50  = "SMA50"
+var trendRuleSMA100 = "SMA100"
+var trendRuleSMA200 = "SMA200"
+
+// Select from User input options
+TrendRuleInput          = input(title="Detect Bullish Trend Based On", defval=trendRuleEMA8, options=[trendRuleEMA8, trendRuleEMA12, trendRuleEMA26, trendRuleSMA10,trendRuleSMA50, trendRuleSMA100, trendRuleSMA200, "None"])
+CandlePerfRankInput     = input(title="Display Candles with min. Performance Rank Of", defval="All", options=["*****", "****", "***", "**", "*", "All"])
+CandleInfoInput         = input(title="Display Candle Information Containing", defval="All", options=["Statistics", "Description", "Sources", "All", "None"])
+AbandonedBabyInput      = input(title="Abandoned Baby *****", defval=true)
+DojiInput               = input(title="Doji ****", defval=true)
+DojiStarInput           = input(title="Doji Star ***", defval=true)
+DragonflyDojiInput      = input(title="Dragonfly Doji *", defval=true)
+EngulfingInput          = input(title="Engulfing *", defval=true)
+HammerInput             = input(title="Hammer **", defval=true)
+HaramiInput             = input(title="Harami ****", defval=true)
+HaramiCrossInput        = input(title="Harami Cross ***", defval=true)
+InvertedHammerInput     = input(title="Inverted Hammer *****", defval=true)
+KickingInput            = input(title="Kicking *", defval=true)
+LongLowerShadowInput    = input(title="Long Lower Shadow *", defval=true)
+MarubozuWhiteInput      = input(title="Marubozu White **", defval=true)
+MorningDojiStarInput    = input(title="Morning Doji Star ****", defval=true)
+MorningStarInput        = input(title="Morning Star *****", defval=true)
+PiercingInput           = input(title="Piercing *****", defval=true)
+RisingThreeMethodsInput = input(title="Rising Three Methods *", defval=true)
+RisingWindowInput       = input(title="Rising Window ***", defval=true)
+SpinningTopWhiteInput   = input(title="Spinning Top White **", defval=true)
+ThreeWhiteSoldiersInput = input(title="Three White Soldiers ****", defval=true)
+TriStarInput            = input(title="Tri-Star ****", defval=true)
+TweezerBottomInput      = input(title="Tweezer Bottom ***", defval=true)
+UpsideTasukiGapInput    = input(title="Upside Tasuki Gap *****", defval=true)
+
+// Figure out the trend based on input chosen
+priceAvg = if TrendRuleInput == trendRuleEMA8
+    ema(close, 8)
+else if TrendRuleInput == trendRuleEMA12
+    ema(close, 12)
+else if TrendRuleInput == trendRuleEMA26
+    ema(close, 26)
+else if TrendRuleInput == trendRuleSMA10
+    sma(close, 10)
+else if TrendRuleInput == trendRuleSMA50
+    sma(close, 50)
+else if TrendRuleInput == trendRuleSMA100
+    sma(close, 100)
+else if TrendRuleInput == trendRuleSMA200
+    sma(close, 200)
+else
+    0.0
+
+if priceAvg != 0.0
+    isUpTrend   := close > priceAvg
+    isDownTrend := close < priceAvg
+
+// *****  1-19
+// ****  20-40
+// ***   41-61
+// **    62-82
+// *     83-103
+PerformanceRankInput = if CandlePerfRankInput == "*****"
+    19
+else if CandlePerfRankInput == "****"
+    40
+else if CandlePerfRankInput == "***"
+    61
+else if CandlePerfRankInput == "**"
+    82
+else
+    103
+
+// Set constants to figure out shape of candle
+C_Len                 = 14    // EMA depth for bodyAvg
+C_ShadowPercent       = 5.0   // Size of shadows
+C_ShadowEqualsPercent = 100.0
+C_DojiBodyPercent     = 5.0
+C_Factor              = 2.0   // Shows the number of times the shadow dominates the candlestick body
+
+// Figure out shape of candle
+C_BodyHi       = max(close, open)
+C_BodyLo       = min(close, open)
+C_Body         = C_BodyHi - C_BodyLo
+C_BodyAvg      = ema(C_Body, C_Len)
+C_SmallBody    = C_Body < C_BodyAvg
+C_LongBody     = C_Body > C_BodyAvg
+C_UpShadow     = high - C_BodyHi
+C_DnShadow     = C_BodyLo - low
+C_HasUpShadow  = C_UpShadow > C_ShadowPercent / 100 * C_Body
+C_HasDnShadow  = C_DnShadow > C_ShadowPercent / 100 * C_Body
+C_WhiteBody    = open < close
+C_BlackBody    = open > close
+C_Range        = high-low
+C_IsInsideBar  = C_BodyHi[1] > C_BodyHi and C_BodyLo[1] < C_BodyLo
+C_BodyMiddle   = C_Body / 2 + C_BodyLo
+C_ShadowEquals = (C_UpShadow == C_DnShadow) or
+                 (abs(C_UpShadow - C_DnShadow) / C_DnShadow * 100) < C_ShadowEqualsPercent and
+                 (abs(C_DnShadow - C_UpShadow) / C_UpShadow * 100) < C_ShadowEqualsPercent
+C_IsDojiBody   = C_Range > 0 and C_Body <= C_Range * C_DojiBodyPercent / 100
+C_Doji         = C_IsDojiBody and C_ShadowEquals
+
+// Set position of candle label on chart
+patternLabelPosLow  = low  - (atr(30) * 0.6)
+patternLabelPosHigh = high + (atr(30) * 0.6)
+
+
+var tagBullishAbandonedBaby  = "Abandoned Baby (Bullish reversal) *****"
+var srcBullishAbandonedBaby  = "http://thepatternsite.com/AbandonBabyBull.html"
+var rankBullishAbandonedBaby = 9 //*****
+var statBullishAbandonedBaby = "Performance: Bullish reversal 70% (bull market), Bullish reversal 55% (bear market)\nFrequency rank: 92/103\nOverall performance rank: 9/103\nBest percentage meeting price target: 71% (bear market, down breakout)\nBest average move in 10 days: -10.31% (bear market, down breakout)\nBest 10-day performance rank: 1/103 (bear market, down breakout)"
+var descBullishAbandonedBaby = "This candlestick pattern is quite rare as far as reversal patterns go. The first of the pattern is a large down candle. Next comes a doji candle that gaps below the candle before it. The doji candle is then followed by another candle that opens even higher and swiftly moves to the upside."
+
+
+var tagDoji  = "Doji (Indecision) ****"
+var srcDoji  = "http://thepatternsite.com/LongLegDoji.html"
+var rankDoji = 37 //****
+var statDoji = "Performance: Bullish continuation 51% (bull market), Bullish reversal 50% (bear market)\nFrequency rank: 41/103\nOverall performance rank: 37/103\nBest percentage meeting price target: 68% (bull market, up breakout)\nBest average move in 10 days: 4.62% (bear market, up breakout)\nBest 10-day performance rank: 38/103 (bear market, up breakout)"
+var descDoji = "When the open and close of a security are essentially equal to each other, a doji candle forms. The length of both upper and lower shadows may vary, causing the candlestick you are left with to either resemble a cross, an inverted cross, or a plus sign. Doji candles show the playout of buyer-seller indecision in a tug-of-war of sorts. As price moves either above or below the opening level during the session, the close is either at or near the opening level."
+
+
+var tagBullishDojiStar  = "Doji Star (Bullish reversal) ***"
+var srcBullishDojiStar  = "http://thepatternsite.com/DojiStarBull.html"
+var rankBullishDojiStar = 49 //***
+var statBullishDojiStar = "Performance: Bearish continuation 64% (bull market), Bearish continuation 71% (bear market)\nFrequency rank: 53/103\nOverall performance rank: 49/103\nBest percentage meeting price target: 59% (bull market, up breakout)\nBest average move in 10 days: 5.46% (bear market, up breakout)\nBest 10-day performance rank: 9/103 (bull market, up breakout)"
+var descBullishDojiStar = "This is a bullish reversal candlestick pattern that is found in a downtrend and consists of two candles. First comes a long red candle, followed by a Doji candle (except 4-Price Doji) that opens below the body of the first one, creating a gap. It is considered a reversal signal with confirmation during the next trading day."
+
+
+var tagBullishDragonflyDoji  = "Dragonfly Doji (Indecision to bullish reversal) *"
+var srcBullishDragonflyDoji  = "http://thepatternsite.com/Dragonfly.html"
+var rankBullishDragonflyDoji = 98 //*
+var statBullishDragonflyDoji = "Performance: Reversal 50% (bull market), Continuation 51% (bear market)\nFrequency rank: 44/103\nOverall performance rank: 98/103\nBest percentage meeting price target: 80% (bear market, down breakout)\nBest average move in 10 days: -5.02% (bear market, down breakout)\nBest 10-day performance rank: 17/103 (bull market, down breakout)"
+var descBullishDragonflyDoji = "Similar to other Doji days, this particular Doji also regularly appears at pivotal market moments. This is a specific Doji where both the open and close price are at the high of a given day."
+
+
+var tagBullishEngulfing  = "Engulfing (Bullish reversal) *"
+var srcBullishEngulfing  = "http://thepatternsite.com/BullEngulfing.html"
+var rankBullishEngulfing = 84 //*
+var statBullishEngulfing = "Performance: Bullish reversal 63% (bull market), Bullish reversal 62% (bear market)\nFrequency rank: 12/103\nOverall performance rank: 84/103\nBest percentage meeting price target: 67% (bear market, down breakout)\nBest average move in 10 days: -6.31% (bear market, down breakout)\nBest 10-day performance rank: 14/103 (bear market, down breakout)"
+var descBullishEngulfing = "At the end of a given downward trend, there will most likely be a reversal pattern. To distinguish the first day, this candlestick pattern uses a small body, followed by a day where the candle body fully overtakes the body from the day before, and closes in the trend’s opposite direction. Although similar to the outside reversal chart pattern, it is not essential for this pattern to completely overtake the range (high to low), rather only the open and the close."
+
+
+var tagBullishHammer  = "Hammer (Bullish reversal) **"
+var srcBullishHammer  = "http://thepatternsite.com/Hammer.html"
+var rankBullishHammer = 65 //**
+var statBullishHammer = "Performance: Bullish reversal 60% (bull market), Bullish reversal 59% (bear market)\nFrequency rank: 36/103\nOverall performance rank: 65/103\nBest percentage meeting price target: 88% (bull market, up breakout)\nBest average move in 10 days: -4.12% (bear market, down breakout)\nBest 10-day performance rank: 48/103 (bear market, down breakout)"
+var descBullishHammer = "Hammer candlesticks form when a security moves lower after the open, but continues to rally into close above the intraday low. The candlestick that you are left with will look like a square attached to a long stick-like figure. This candlestick is called a Hammer if it happens to form during a decline."
+
+
+var tagBullishHarami  = "Harami (Bullish reversal) ****"
+var srcBullishHarami  = "http://thepatternsite.com/HaramiBull.html"
+var rankBullishHarami = 38 //****
+var statBullishHarami = "Performance: Bullish reversal 53% (bull market), Bullish reversal 51% (bear market)\nFrequency rank: 25/103\nOverall performance rank: 38/103\nBest percentage meeting price target: 69% (bull market, up breakout)\nBest average move in 10 days: 4.05% (bear market, up breakout)\nBest 10-day performance rank: 45/103 (bear market, up breakout)"
+var descBullishHarami = "This two-day candlestick pattern consists of a small-bodied green candle that is entirely encompassed within the body of what was once a red-bodied candle."
+
+
+var tagBullishHaramiCross  = "Harami Cross (Bullish reversal) ***"
+var srcBullishHaramiCross  = "http://thepatternsite.com/HaramiCrossBull.html"
+var rankBullishHaramiCross = 50 //***
+var statBullishHaramiCross = "Performance: Bearish continuation 55% (bull market), Bearish continuation 56% (bear market)\nFrequency rank: 47/103\nOverall performance rank: 50/103\nBest percentage meeting price target: 74% (bull market, up breakout)\nBest average move in 10 days: 4.52% (bear market, up breakout)\nBest 10-day performance rank: 36/103 (bull market, up breakout)"
+var descBullishHaramiCross = "This candlestick pattern is a variation of the Harami Bullish pattern. It is found during a downtrend. The two-day candlestick pattern consists of a Doji candle that is entirely encompassed within the body of what was once a red-bodied candle."
+
+
+var tagBullishInvertedHammer  = "Inverted Hammer (Bullish reversal) *****"
+var srcBullishInvertedHammer  = "http://thepatternsite.com/HammerInv.html"
+var rankBullishInvertedHammer = 6 //*****
+var statBullishInvertedHammer = "Performance: Bearish continuation 65% (bull market), Bearish continuation 67% (bear market)\nFrequency rank: 61/103\nOverall performance rank: 6/103\nBest percentage meeting price target: 68% (bull market, up breakout)\nBest average move in 10 days: 7.74% (bear market, up breakout)\nBest 10-day performance rank: 9/103 (bear market, up breakout)"
+var descBullishInvertedHammer = "If in a downtrend, then the open is lower. When it eventually trades higher, but closes near its open, it will look like an inverted version of the Hammer Candlestick. This is a one-day bullish reversal pattern."
+
+
+var tagBullishKicking  = "Kicking (Bullish reversal) *"
+var srcBullishKicking  = "http://thepatternsite.com/KickingBull.html"
+var rankBullishKicking = 96 //*
+var statBullishKicking = "Performance: Bullish reversal 53% (bull market), Bullish reversal 50% (bear market)\nFrequency rank: 100/103\nOverall performance rank: 96/103\nBest percentage meeting price target: 52% (bull market, up breakout)\nBest average move in 10 days: 2.78% (bull market, up breakout)\nBest 10-day performance rank: 57/103 (bull market, up breakout)"
+var descBullishKicking = "The first day candlestick is a bearish marubozu candlestick with next to no upper or lower shadow and where the price opens at the day’s high and closes at the day’s low. The second day is a bullish marubozu pattern, with next to no upper or lower shadow and where the price opens at the day’s low and closes at the day’s high. Additionally, the second day gaps up extensively and opens above the opening price of the day before. This gap or window, as the Japanese call it, lies between day one and day two’s bullish candlesticks."
+
+
+var tagBullishLongLowerShadow  = "Long Lower Shadow (Indecision) *"
+var srcBullishLongLowerShadow  = "http://thepatternsite.com"
+var rankBullishLongLowerShadow = 103 //*
+var statBullishLongLowerShadow = ""
+var descBullishLongLowerShadow = "To indicate seller domination of the first part of a session, candlesticks will present with long lower shadows and short upper shadows, consequently lowering prices."
+
+
+var tagBullishMarubozuWhite  = "Marubozu White (Continuation) **"
+var srcBullishMarubozuWhite  = "http://thepatternsite.com/WhiteMarubozu.html"
+var rankBullishMarubozuWhite = 71 //**
+var statBullishMarubozuWhite = "Performance: Continuation 56% (bull market), Continuation 56% (bear market)\nFrequency rank: 27/103\nOverall performance rank: 71/103\nBest percentage meeting price target: 79% (bear market, down breakout)\nBest average move in 10 days: -4.79% (bear market, down breakout)\nBest 10-day performance rank: 26/103 (bull market, down breakout)"
+var descBullishMarubozuWhite = "A Marubozu White Candle is a candlestick that does not have a shadow that extends from its candle body at either the open or the close. Marubozu is Japanese for “close-cropped” or “close-cut.” Other sources may call it a Bald or Shaven Head Candle."
+
+
+var tagBullishMorningDojiStar  = "Morning Doji Star (Bullish reversal) ****"
+var srcBullishMorningDojiStar  = "http://thepatternsite.com/MorningDojiStar.html"
+var rankBullishMorningDojiStar = 25 //****
+var statBullishMorningDojiStar = "Performance: Bullish reversal 76% (bull market), Bullish reversal 71% (bear market)\nFrequency rank: 78/103\nOverall performance rank: 25/103\nBest percentage meeting price target: 49% (bull market, up breakout)\nBest average move in 10 days: -6.25% (bear market, down breakout)\nBest 10-day performance rank: 15/103 (bear market, down breakout)"
+var descBullishMorningDojiStar = "This candlestick pattern is a variation of the Morning Star pattern. A three-day bullish reversal pattern, which consists of three candlesticks will look something like this: The first being a long-bodied red candle that extends the current downtrend. Next comes a Doji that gaps down on the open. After that comes a long-bodied green candle, which gaps up on the open and closes above the midpoint of the body of the first day. It is more bullish than the regular morning star pattern because of the existence of the Doji."
+
+
+var tagBullishMorningStar  = "Morning Star (Bullish reversal) *****"
+var srcBullishMorningStar  = "http://thepatternsite.com/MorningStar.html"
+var rankBullishMorningStar = 12 //*****
+var statBullishMorningStar = "Performance: Bullish reversal 78% (bull market), Bullish reversal 65% (bear market)\nFrequency rank: 66/103\nOverall performance rank: 12/103\nBest percentage meeting price target: 49% (bear market, up breakout)\nBest average move in 10 days: -8.53% (bear market, down breakout)\nBest 10-day performance rank: 3/103 (bear market, down breakout)"
+var descBullishMorningStar = "A three-day bullish reversal pattern, which consists of three candlesticks will look something like this: The first being a long-bodied red candle that extends the current downtrend. Next comes a short, middle candle that gaps down on the open. After comes a long-bodied green candle, which gaps up on the open and closes above the midpoint of the body of the first day."
+
+
+var tagBullishPiercing  = "Piercing (Bullish reversal) *****"
+var srcBullishPiercing  = "http://thepatternsite.com/Piercing.html"
+var rankBullishPiercing = 13 //*****
+var statBullishPiercing = "Performance: Bullish reversal 64% (bull market), Bullish reversal 60% (bear market)\nFrequency rank: 40/103\nOverall performance rank: 13/103\nBest percentage meeting price target: 67% (bull market, up breakout)\nBest average move in 10 days: -6.57% (bear market, down breakout)\nBest 10-day performance rank: 13/103 (bear market, down breakout)"
+var descBullishPiercing = "Piercing is a two-candle bullish reversal candlestick pattern found in a downtrend. The first candle is red and has a larger than average body. The second candle is green and opens below the low of the prior candle, creating a gap, and then closes above the midpoint of the first candle. The pattern shows a possible shift in the momentum from the downside to the upside, indicating that a reversal might happen soon."
+
+
+var tagBullishRisingThreeMethods  = "Rising Three Methods (Bullish continuation) *"
+var srcBullishRisingThreeMethods  = "http://thepatternsite.com/Rising3Methods.html"
+var rankBullishRisingThreeMethods = 94 //*
+var statBullishRisingThreeMethods = "Performance: Bullish continuation 74% (bull market), Bullish continuation 79% (bear market)\nFrequency rank: 88/103\nOverall performance rank: 94/103\nBest percentage meeting price target: 60% (bull market, up breakout)\nBest average move in 10 days: -5.10% (bull market, down breakout)\nBest 10-day performance rank: 7/103 (bull market, down breakout)"
+var descBullishRisingThreeMethods = "Rising Three Methods is a five-candle bullish pattern that signifies a continuation of an existing uptrend. The first candle is long and green, followed by three short red candles with bodies inside the range of the first candle. The last candle is also green and long and it closes above the close of the first candle. This decisive fifth strongly bullish candle hints that bears could not reverse the prior uptrend and that bulls have regained control of the market."
+
+
+var tagBullishRisingWindow  = "Rising Window (Bullish continuation) ***"
+var srcBullishRisingWindow  = "http://thepatternsite.com/RisingWindow.html"
+var rankBullishRisingWindow = 42 //***
+var statBullishRisingWindow = "Performance: Bullish continuation 75% (bull market), Bullish continuation 72% (bear market)\nFrequency rank: 20/103\nOverall performance rank: 42/103\nStopped in gap: 20%\nAverage time to gap closed: 79 days\nMedian time to gap closed: 11 days"
+var descBullishRisingWindow = "Rising Window is a two-candle bullish continuation pattern that forms during an uptrend. Both candles in the pattern can be of any type with the exception of the Four-Price Doji. The most important characteristic of the pattern is a price gap between the first candle's high and the second candle's low. That gap (window) between two bars signifies support against the selling pressure."
+
+
+var tagSpinningTopWhite  = "Spinning Top White (Indecision) **"
+var srcSpinningTopWhite  = "http://thepatternsite.com/SpinTopWhite.html"
+var rankSpinningTopWhite = 69 //**
+var statSpinningTopWhite = "Performance: Reversal 50% (bull market), Reversal 52% (bear market)\nFrequency rank: 2/103\nOverall performance rank: 69/103\nBest percentage meeting price target: 83% (bull market, up breakout)\nBest average move in 10 days: -3.63% (bear market, down breakout)\nBest 10-day performance rank: 58/103 (bear market, down breakout)"
+var descSpinningTopWhite = "White spinning tops are candlestick lines that are small, green-bodied, and possess shadows (upper and lower) that end up exceeding the length of candle bodies. They often signal indecision between buyer and seller."
+
+
+var tagBullishThreeWhiteSoldiers  = "Three White Soldiers (Bullish reversal) ****"
+var srcBullishThreeWhiteSoldiers  = "http://thepatternsite.com/ThreeWhiteSoldiers.html"
+var rankBullishThreeWhiteSoldiers = 32 //****
+var statBullishThreeWhiteSoldiers = "Performance: Bullish reversal 82% (bull market), Bullish reversal 84% (bear market)\nFrequency rank: 67/103\nOverall performance rank: 32/103\nBest percentage meeting price target: 34% (bull/bear market, up/down breakout)\nBest average move in 10 days: -7.66% (bear market, down breakout)\nBest 10-day performance rank: 4/103 (bull market, down breakout)"
+var descBullishThreeWhiteSoldiers = "This bullish reversal pattern is made up of three long-bodied, green candles in immediate succession. Each one opens within the body before it and the close is near to the daily high."
+
+
+var tagBullishTriStar  = "Tri-Star (Bullish reversal) ****"
+var srcBullishTriStar  = "http://thepatternsite.com/TriStarBull.html"
+var rankBullishTriStar = 28 //****
+var statBullishTriStar = "Performance: Bullish reversal 60% (bull market), Bullish reversal 55% (bear market)\nFrequency rank: 79/103\nOverall performance rank: 28/103\nBest percentage meeting price target: 77% (bear market, up breakout)\nBest average move in 10 days: 5.11% (bear market, up breakout)\nBest 10-day performance rank: 26/103 (bear market, up breakout)"
+var descBullishTriStar = "A bullish TriStar candlestick pattern can form when three doji candlesticks materialize in immediate succession at the tail-end of an extended downtrend. The first doji candle marks indecision between bull and bear. The second doji gaps in the direction of the leading trend. The third changes the attitude of the market once the candlestick opens in the direction opposite to the trend. Each doji candle has a shadow, all comparatively shallow, which signify an interim cutback in volatility."
+
+
+var tagBullishTweezerBottom  = "Tweezer Bottom (Bullish reversal) ***"
+var srcBullishTweezerBottom  = "http://thepatternsite.com/TweezersBottom.html"
+var rankBullishTweezerBottom = 44 //***
+var statBullishTweezerBottom = "Performance: Bearish continuation 52% (bull market), Bearish continuation 56% (bear market)\nFrequency rank: 39/103\nOverall performance rank: 44/103\nBest percentage meeting price target: 71% (bull market, up breakout)\nBest average move in 10 days: 4.95% (bear market, up breakout)\nBest 10-day performance rank: 29/103 (bear market, up breakout)"
+var descBullishTweezerBottom = "Tweezer Bottom is a two-candle pattern that signifies a potential bullish reversal. The pattern is found during a downtrend. The first candle is long and red, the second candle is green, its lows nearly identical to the low of the previous candle. The virtually identical lows together with the inverted directions hint that bulls might be taking over the market."
+
+
+var tagBullishUpsideTasukiGap  = "Upside Tasuki Gap (Bullish continuation) *****"
+var srcBullishUpsideTasukiGap  = "http://thepatternsite.com/UpsideTasukiGap.html"
+var rankBullishUpsideTasukiGap = 5 //*****
+var statBullishUpsideTasukiGap = "Performance: Bullish continuation 57% (bull market), Bearish continuation 53% (bear market)\nFrequency rank: 74/103\nOverall performance rank: 5/103\nBest percentage meeting price target: 38% (bear market, up breakout)\nBest average move in 10 days: -9.20% (bear market, down breakout)\nBest 10-day performance rank: 2/103 (bear market, down breakout)"
+var descBullishUpsideTasukiGap = "Upside Tasuki Gap is a three-candle pattern found in an uptrend that usually hints at the continuation of the uptrend. The first candle is long and green, followed by a smaller green candle with its opening price that gaps above the body of the previous candle. The third candle is red and it closes inside the gap created by the first two candles, unable to close it fully. The bear’s inability to close the gap hints that the uptrend might continue."
+
+
+// Abandoned Baby Bullish
+C_AbandonedBabyBullishNumberOfCandles = 3
+C_AbandonedBabyBullish = isDownTrend[2] and C_BlackBody[2] and C_IsDojiBody[1] and low[2] > high[1] and C_WhiteBody and high[1] < low ? true : false
+
+if C_AbandonedBabyBullish and AbandonedBabyInput and rankBullishAbandonedBaby <= PerformanceRankInput
+    ttBullishAbandonedBaby = tagBullishAbandonedBaby
+    if CandleInfoInput == "Statistics"
+        ttBullishAbandonedBaby := ttBullishAbandonedBaby + "\n\n" + statBullishAbandonedBaby
+    if CandleInfoInput == "Description"
+        ttBullishAbandonedBaby := ttBullishAbandonedBaby + "\n\n" + descBullishAbandonedBaby
+    if CandleInfoInput == "Sources"
+        ttBullishAbandonedBaby := ttBullishAbandonedBaby + "\n\n" + "See: " + srcBullishAbandonedBaby
+    if CandleInfoInput == "All"
+        ttBullishAbandonedBaby := ttBullishAbandonedBaby + "\n\n" + statBullishAbandonedBaby + "\n\n" + descBullishAbandonedBaby + "\n\n" + "See: " + srcBullishAbandonedBaby
+
+    label.new(bar_index, patternLabelPosLow, text="AB", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishAbandonedBaby)
+alertcondition(C_AbandonedBabyBullish, title="Abandoned Baby", message="New Abandoned Baby - Bullish pattern detected.")
+
+
+// Doji Bullish
+C_DojiNumberOfCandles = 1
+C_DragonflyDoji = C_IsDojiBody and C_UpShadow <= C_Body ? true : false
+C_GravestoneDojiOne = C_IsDojiBody and C_DnShadow <= C_Body ? true : false
+
+if C_Doji and not C_DragonflyDoji and not C_GravestoneDojiOne and DojiInput and C_WhiteBody and rankDoji <= PerformanceRankInput
+    ttDoji = tagDoji
+    if CandleInfoInput == "Statistics"
+        ttDoji := ttDoji + "\n\n" + statDoji
+    if CandleInfoInput == "Description"
+        ttDoji := ttDoji + "\n\n" + descDoji
+    if CandleInfoInput == "Sources"
+        ttDoji := ttDoji + "\n\n" + "See: " + srcDoji
+    if CandleInfoInput == "All"
+        ttDoji := ttDoji + "\n\n" + statDoji + "\n\n" + descDoji + "\n\n" + "See: " + srcDoji
+
+    label.new(bar_index, patternLabelPosLow, text="D", style=label.style_label_up, color=color.gray, textcolor=color.white, tooltip=ttDoji)
+alertcondition(C_Doji and not C_DragonflyDoji and not C_GravestoneDojiOne, title="Doji", message="New Doji pattern detected.")
+
+
+// Doji Star Bullish
+C_DojiStarBullishNumberOfCandles = 2
+C_DojiStarBullish = isDownTrend and C_BlackBody[1] and C_LongBody[1] and C_IsDojiBody and C_BodyHi < C_BodyLo[1] ? true : false
+
+if C_DojiStarBullish and DojiStarInput and rankBullishDojiStar <= PerformanceRankInput
+    ttBullishDojiStar = tagBullishDojiStar
+    if CandleInfoInput == "Statistics"
+        ttBullishDojiStar := ttBullishDojiStar + "\n\n" + statBullishDojiStar
+    if CandleInfoInput == "Description"
+        ttBullishDojiStar := ttBullishDojiStar + "\n\n" + descBullishDojiStar
+    if CandleInfoInput == "Sources"
+        ttBullishDojiStar := ttBullishDojiStar + "\n\n" + "See: " + srcBullishDojiStar
+    if CandleInfoInput == "All"
+        ttBullishDojiStar := ttBullishDojiStar + "\n\n" + statBullishDojiStar + "\n\n" + descBullishDojiStar + "\n\n" + "See: " + srcBullishDojiStar
+
+    label.new(bar_index, patternLabelPosLow, text="DS", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishDojiStar)
+alertcondition(C_DojiStarBullish, title="Doji Star", message="New Doji Star - Bullish pattern detected.")
+
+
+// Dragonfly Doji Bullish
+C_DragonflyDojiBullishNumberOfCandles = 1
+C_DragonflyDojiBullish = C_IsDojiBody and C_UpShadow <= C_Body ? true : false
+
+if C_DragonflyDojiBullish and DragonflyDojiInput and rankBullishDragonflyDoji <= PerformanceRankInput
+    ttBullishDragonflyDoji = tagBullishDragonflyDoji
+    if CandleInfoInput == "Statistics"
+        ttBullishDragonflyDoji := ttBullishDragonflyDoji + "\n\n" + statBullishDragonflyDoji
+    if CandleInfoInput == "Description"
+        ttBullishDragonflyDoji := ttBullishDragonflyDoji + "\n\n" + descBullishDragonflyDoji
+    if CandleInfoInput == "Sources"
+        ttBullishDragonflyDoji := ttBullishDragonflyDoji + "\n\n" + "See: " + srcBullishDragonflyDoji
+    if CandleInfoInput == "All"
+        ttBullishDragonflyDoji := ttBullishDragonflyDoji + "\n\n" + statBullishDragonflyDoji + "\n\n" + descBullishDragonflyDoji + "\n\n" + "See: " + srcBullishDragonflyDoji
+
+    label.new(bar_index, patternLabelPosLow, text="DD", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishDragonflyDoji)
+alertcondition(C_DragonflyDojiBullish, title="Dragonfly Doji", message="New Dragonfly Doji - Bullish pattern detected.")
+
+
+// Engulfing Bullish
+C_EngulfingBullishNumberOfCandles = 2
+C_EngulfingBullish = isDownTrend and C_WhiteBody and C_LongBody and C_BlackBody[1] and C_SmallBody[1] and close >= open[1] and open <= close[1] and ( close > open[1] or open < close[1] ) ? true : false
+
+if C_EngulfingBullish and EngulfingInput and rankBullishEngulfing <= PerformanceRankInput
+    ttBullishEngulfing = tagBullishEngulfing
+    if CandleInfoInput == "Statistics"
+        ttBullishEngulfing := ttBullishEngulfing + "\n\n" + statBullishEngulfing
+    if CandleInfoInput == "Description"
+        ttBullishEngulfing := ttBullishEngulfing + "\n\n" + descBullishEngulfing
+    if CandleInfoInput == "Sources"
+        ttBullishEngulfing := ttBullishEngulfing + "\n\n" + "See: " + srcBullishEngulfing
+    if CandleInfoInput == "All"
+        ttBullishEngulfing := ttBullishEngulfing + "\n\n" + statBullishEngulfing + "\n\n" + descBullishEngulfing + "\n\n" + "See: " + srcBullishEngulfing
+
+    label.new(bar_index, patternLabelPosLow, text="BE", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishEngulfing)
+alertcondition(C_EngulfingBullish, title="Engulfing", message="New Engulfing - Bullish pattern detected.")
+
+
+// Hammer Bullish
+C_HammerBullishNumberOfCandles = 1
+C_HammerBullish = C_SmallBody and C_Body > 0 and C_BodyLo > hl2 and C_DnShadow >= C_Factor * C_Body and not C_HasUpShadow and isDownTrend ? true : false
+
+if C_HammerBullish and HammerInput and rankBullishHammer <= PerformanceRankInput
+    ttBullishHammer = tagBullishHammer
+    if CandleInfoInput == "Statistics"
+        ttBullishHammer := ttBullishHammer + "\n\n" + statBullishHammer
+    if CandleInfoInput == "Description"
+        ttBullishHammer := ttBullishHammer + "\n\n" + descBullishHammer
+    if CandleInfoInput == "Sources"
+        ttBullishHammer := ttBullishHammer + "\n\n" + "See: " + srcBullishHammer
+    if CandleInfoInput == "All"
+        ttBullishHammer := ttBullishHammer + "\n\n" + statBullishHammer + "\n\n" + descBullishHammer + "\n\n" + "See: " + srcBullishHammer
+
+    label.new(bar_index, patternLabelPosLow, text="H", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishHammer)
+alertcondition(C_HammerBullish, title="Hammer", message="New Hammer - Bullish pattern detected.")
+
+
+// Harami Cross Bullish
+C_HaramiCrossBullishNumberOfCandles = 2
+C_HaramiCrossBullish = C_LongBody[1] and C_BlackBody[1] and isDownTrend[1] and C_IsDojiBody and high <= C_BodyHi[1] and low >= C_BodyLo[1] ? true : false
+
+if C_HaramiCrossBullish and HaramiCrossInput and rankBullishHaramiCross <= PerformanceRankInput
+    ttBullishHaramiCross = tagBullishHaramiCross
+    if CandleInfoInput == "Statistics"
+        ttBullishHaramiCross := ttBullishHaramiCross + "\n\n" + statBullishHaramiCross
+    if CandleInfoInput == "Description"
+        ttBullishHaramiCross := ttBullishHaramiCross + "\n\n" + descBullishHaramiCross
+    if CandleInfoInput == "Sources"
+        ttBullishHaramiCross := ttBullishHaramiCross + "\n\n" + "See: " + srcBullishHaramiCross
+    if CandleInfoInput == "All"
+        ttBullishHaramiCross := ttBullishHaramiCross + "\n\n" + statBullishHaramiCross + "\n\n" + descBullishHaramiCross + "\n\n" + "See: " + srcBullishHaramiCross
+
+    label.new(bar_index, patternLabelPosLow, text="HC", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishHaramiCross)
+alertcondition(C_HaramiCrossBullish, title="Harami Cross", message="New Harami Cross - Bullish pattern detected.")
+
+
+// Harami Bullish
+C_HaramiBullishNumberOfCandles = 2
+C_HaramiBullish = C_LongBody[1] and C_BlackBody[1] and isDownTrend[1] and C_WhiteBody and C_SmallBody and high <= C_BodyHi[1] and low >= C_BodyLo[1] ? true : false
+
+if C_HaramiBullish and HaramiInput and rankBullishHarami <= PerformanceRankInput
+    ttBullishHarami = tagBullishHarami
+    if CandleInfoInput == "Statistics"
+        ttBullishHarami := ttBullishHarami + "\n\n" + statBullishHarami
+    if CandleInfoInput == "Description"
+        ttBullishHarami := ttBullishHarami + "\n\n" + descBullishHarami
+    if CandleInfoInput == "Sources"
+        ttBullishHarami := ttBullishHarami + "\n\n" + "See: " + srcBullishHarami
+    if CandleInfoInput == "All"
+        ttBullishHarami := ttBullishHarami + "\n\n" + statBullishHarami + "\n\n" + descBullishHarami + "\n\n" + "See: " + srcBullishHarami
+
+    label.new(bar_index, patternLabelPosLow, text="BH", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishHarami)
+alertcondition(C_HaramiBullish, title="Harami", message="New Harami - Bullish pattern detected.")
+
+
+// Inverted Hammer Bullish
+C_InvertedHammerBullishNumberOfCandles = 1
+C_InvertedHammerBullish = C_SmallBody and C_Body > 0 and C_BodyHi < hl2 and C_UpShadow >= C_Factor * C_Body and not C_HasDnShadow and isDownTrend ? true :false
+
+if C_InvertedHammerBullish and InvertedHammerInput and rankBullishInvertedHammer <= PerformanceRankInput
+    ttBullishInvertedHammer = tagBullishInvertedHammer
+    if CandleInfoInput == "Statistics"
+        ttBullishInvertedHammer := ttBullishInvertedHammer + "\n\n" + statBullishInvertedHammer
+    if CandleInfoInput == "Description"
+        ttBullishInvertedHammer := ttBullishInvertedHammer + "\n\n" + descBullishInvertedHammer
+    if CandleInfoInput == "Sources"
+        ttBullishInvertedHammer := ttBullishInvertedHammer + "\n\n" + "See: " + srcBullishInvertedHammer
+    if CandleInfoInput == "All"
+        ttBullishInvertedHammer := ttBullishInvertedHammer + "\n\n" + statBullishInvertedHammer + "\n\n" + descBullishInvertedHammer + "\n\n" + "See: " + srcBullishInvertedHammer
+
+    label.new(bar_index, patternLabelPosLow, text="IH", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishInvertedHammer)
+alertcondition(C_InvertedHammerBullish, title="Inverted Hammer", message="New Inverted Hammer - Bullish pattern detected.")
+
+
+// Kicking Bullish
+C_KickingBullishNumberOfCandles = 2
+C_MarubozuShadowPercent = 5.0
+C_Marubozu = C_LongBody and C_UpShadow <= C_MarubozuShadowPercent/100*C_Body and C_DnShadow <= C_MarubozuShadowPercent/100*C_Body
+C_MarubozuWhiteBullishKicking = C_Marubozu and C_WhiteBody
+C_MarubozuBlackBullish = C_Marubozu and C_BlackBody
+C_KickingBullish = C_MarubozuBlackBullish[1] and C_MarubozuWhiteBullishKicking and high[1] < low ? true : false
+
+if C_KickingBullish and KickingInput and rankBullishKicking <= PerformanceRankInput
+    ttBullishKicking = tagBullishKicking
+    if CandleInfoInput == "Statistics"
+        ttBullishKicking := ttBullishKicking + "\n\n" + statBullishKicking
+    if CandleInfoInput == "Description"
+        ttBullishKicking := ttBullishKicking + "\n\n" + descBullishKicking
+    if CandleInfoInput == "Sources"
+        ttBullishKicking := ttBullishKicking + "\n\n" + "See: " + srcBullishKicking
+    if CandleInfoInput == "All"
+        ttBullishKicking := ttBullishKicking + "\n\n" + statBullishKicking + "\n\n" + descBullishKicking + "\n\n" + "See: " + srcBullishKicking
+
+    label.new(bar_index, patternLabelPosLow, text="K", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishKicking)
+alertcondition(C_KickingBullish, title="Kicking", message="New Kicking - Bullish pattern detected.")
+
+
+// Long Lower Shadow Bullish
+C_LongLowerShadowBullishNumberOfCandles = 1
+C_LongLowerShadowPercent = 75.0
+C_LongLowerShadowBullish = C_DnShadow > C_Range / 100 * C_LongLowerShadowPercent ? true : false
+
+if C_LongLowerShadowBullish and LongLowerShadowInput and rankBullishLongLowerShadow <= PerformanceRankInput
+    ttBullishLongLowerShadow = tagBullishLongLowerShadow
+    if CandleInfoInput == "Statistics"
+        ttBullishLongLowerShadow := ttBullishLongLowerShadow + "\n\n" + statBullishLongLowerShadow
+    if CandleInfoInput == "Description"
+        ttBullishLongLowerShadow := ttBullishLongLowerShadow + "\n\n" + descBullishLongLowerShadow
+    if CandleInfoInput == "Sources"
+        ttBullishLongLowerShadow := ttBullishLongLowerShadow + "\n\n" + "See: " + srcBullishLongLowerShadow
+    if CandleInfoInput == "All"
+        ttBullishLongLowerShadow := ttBullishLongLowerShadow + "\n\n" + statBullishLongLowerShadow + "\n\n" + descBullishLongLowerShadow + "\n\n" + "See: " + srcBullishLongLowerShadow
+
+    label.new(bar_index, patternLabelPosLow, text="LLS", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishLongLowerShadow)
+alertcondition(C_LongLowerShadowBullish, title="Long Lower Shadow", message="New Long Lower Shadow - Bullish pattern detected.")
+
+
+// Marubozu White Bullish
+C_MarubozuWhiteBullishNumberOfCandles = 1
+C_MarubozuShadowPercentWhite = 5.0
+C_MarubozuWhiteBullish = C_WhiteBody and C_LongBody and C_UpShadow <= C_MarubozuShadowPercentWhite / 100 * C_Body and C_DnShadow <= C_MarubozuShadowPercentWhite / 100 * C_Body and C_WhiteBody ? true : false
+
+if C_MarubozuWhiteBullish and MarubozuWhiteInput and rankBullishMarubozuWhite <= PerformanceRankInput
+    ttBullishMarubozuWhite = tagBullishMarubozuWhite
+    if CandleInfoInput == "Statistics"
+        ttBullishMarubozuWhite := ttBullishMarubozuWhite + "\n\n" + statBullishMarubozuWhite
+    if CandleInfoInput == "Description"
+        ttBullishMarubozuWhite := ttBullishMarubozuWhite + "\n\n" + descBullishMarubozuWhite
+    if CandleInfoInput == "Sources"
+        ttBullishMarubozuWhite := ttBullishMarubozuWhite + "\n\n" + "See: " + srcBullishMarubozuWhite
+    if CandleInfoInput == "All"
+        ttBullishMarubozuWhite := ttBullishMarubozuWhite + "\n\n" + statBullishMarubozuWhite + "\n\n" + descBullishMarubozuWhite + "\n\n" + "See: " + srcBullishMarubozuWhite
+
+    label.new(bar_index, patternLabelPosLow, text="MW", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishMarubozuWhite)
+alertcondition(C_MarubozuWhiteBullish, title="Marubozu White", message="New Marubozu White - Bullish pattern detected.")
+
+
+// Morning Doji Start Bullish
+C_MorningDojiStarBullishNumberOfCandles = 3
+C_MorningDojiStarBullish = C_LongBody[2] and C_IsDojiBody[1] and C_LongBody and isDownTrend and C_BlackBody[2] and C_BodyHi[1] < C_BodyLo[2] and C_WhiteBody and C_BodyHi >= C_BodyMiddle[2] and C_BodyHi < C_BodyHi[2] and C_BodyHi[1] < C_BodyLo ? true : false
+
+if C_MorningDojiStarBullish and MorningDojiStarInput and rankBullishMorningDojiStar <= PerformanceRankInput
+    ttBullishMorningDojiStar = tagBullishMorningDojiStar
+    if CandleInfoInput == "Statistics"
+        ttBullishMorningDojiStar := ttBullishMorningDojiStar + "\n\n" + statBullishMorningDojiStar
+    if CandleInfoInput == "Description"
+        ttBullishMorningDojiStar := ttBullishMorningDojiStar + "\n\n" + descBullishMorningDojiStar
+    if CandleInfoInput == "Sources"
+        ttBullishMorningDojiStar := ttBullishMorningDojiStar + "\n\n" + "See: " + srcBullishMorningDojiStar
+    if CandleInfoInput == "All"
+        ttBullishMorningDojiStar := ttBullishMorningDojiStar + "\n\n" + statBullishMorningDojiStar + "\n\n" + descBullishMorningDojiStar + "\n\n" + "See: " + srcBullishMorningDojiStar
+
+    label.new(bar_index, patternLabelPosLow, text="MDS", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishMorningDojiStar)
+alertcondition(C_MorningDojiStarBullish, title="Morning Doji Star", message="New Morning Doji Star - Bullish pattern detected.")
+
+
+// Morning Star Bullish
+C_MorningStarBullishNumberOfCandles = 3
+C_MorningStarBullish = C_LongBody[2] and C_SmallBody[1] and C_LongBody and isDownTrend and C_BlackBody[2] and C_BodyHi[1] < C_BodyLo[2] and C_WhiteBody and C_BodyHi >= C_BodyMiddle[2] and C_BodyHi < C_BodyHi[2] and C_BodyHi[1] < C_BodyLo ? true : false
+
+if C_MorningStarBullish and MorningStarInput and rankBullishMorningStar <= PerformanceRankInput
+    ttBullishMorningStar = tagBullishMorningStar
+    if CandleInfoInput == "Statistics"
+        ttBullishMorningStar := ttBullishMorningStar + "\n\n" + statBullishMorningStar
+    if CandleInfoInput == "Description"
+        ttBullishMorningStar := ttBullishMorningStar + "\n\n" + descBullishMorningStar
+    if CandleInfoInput == "Sources"
+        ttBullishMorningStar := ttBullishMorningStar + "\n\n" + "See: " + srcBullishMorningStar
+    if CandleInfoInput == "All"
+        ttBullishMorningStar := ttBullishMorningStar + "\n\n" + statBullishMorningStar + "\n\n" + descBullishMorningStar + "\n\n" + "See: " + srcBullishMorningStar
+
+    label.new(bar_index, patternLabelPosLow, text="MS", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishMorningStar)
+alertcondition(C_MorningStarBullish, title="Morning Star", message="New Morning Star - Bullish pattern detected.")
+
+
+// Piercing Bullish
+C_PiercingBullishNumberOfCandles = 2
+C_PiercingBullish = (isDownTrend[1] and C_BlackBody[1] and C_LongBody[1]) and (C_WhiteBody and open <= low[1] and close > C_BodyMiddle[1] and close < open[1]) ? true : false
+
+if C_PiercingBullish and PiercingInput and rankBullishPiercing <= PerformanceRankInput
+    ttBullishPiercing = tagBullishPiercing
+    if CandleInfoInput == "Statistics"
+        ttBullishPiercing := ttBullishPiercing + "\n\n" + statBullishPiercing
+    if CandleInfoInput == "Description"
+        ttBullishPiercing := ttBullishPiercing + "\n\n" + descBullishPiercing
+    if CandleInfoInput == "Sources"
+        ttBullishPiercing := ttBullishPiercing + "\n\n" + "See: " + srcBullishPiercing
+    if CandleInfoInput == "All"
+        ttBullishPiercing := ttBullishPiercing + "\n\n" + statBullishPiercing + "\n\n" + descBullishPiercing + "\n\n" + "See: " + srcBullishPiercing
+
+    label.new(bar_index, patternLabelPosLow, text="P", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishPiercing)
+alertcondition(C_PiercingBullish, title="Piercing", message="New Piercing - Bullish pattern detected.")
+
+
+// Rising Three Methods Bullish
+C_RisingThreeMethodsBullishNumberOfCandles = 5
+C_RisingThreeMethodsBullish = isUpTrend[4] and (C_LongBody[4] and C_WhiteBody[4]) and (C_SmallBody[3] and C_BlackBody[3] and open[3] < high[4] and close[3] > low[4]) and (C_SmallBody[2] and C_BlackBody[2] and open[2] < high[4] and close[2] > low[4]) and (C_SmallBody[1] and C_BlackBody[1] and open[1] < high[4] and close[1] > low[4]) and (C_LongBody and C_WhiteBody and close > close[4]) ? true : false
+
+if C_RisingThreeMethodsBullish and RisingThreeMethodsInput and rankBullishRisingThreeMethods <= PerformanceRankInput
+    ttBullishRisingThreeMethods = tagBullishRisingThreeMethods
+    if CandleInfoInput == "Statistics"
+        ttBullishRisingThreeMethods := ttBullishRisingThreeMethods + "\n\n" + statBullishRisingThreeMethods
+    if CandleInfoInput == "Description"
+        ttBullishRisingThreeMethods := ttBullishRisingThreeMethods + "\n\n" + descBullishRisingThreeMethods
+    if CandleInfoInput == "Sources"
+        ttBullishRisingThreeMethods := ttBullishRisingThreeMethods + "\n\n" + "See: " + srcBullishRisingThreeMethods
+    if CandleInfoInput == "All"
+        ttBullishRisingThreeMethods := ttBullishRisingThreeMethods + "\n\n" + statBullishRisingThreeMethods + "\n\n" + descBullishRisingThreeMethods + "\n\n" + "See: " + srcBullishRisingThreeMethods
+
+    label.new(bar_index, patternLabelPosLow, text="RTM", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishRisingThreeMethods)
+alertcondition(C_RisingThreeMethodsBullish, title="Rising Three Methods", message="New Rising Three Methods - Bullish pattern detected.")
+
+
+// Rising Window Bullish
+C_RisingWindowBullishNumberOfCandles = 2
+C_RisingWindowBullish = isUpTrend[1] and (C_Range!=0 and C_Range[1]!=0) and low > high[1] ? true : false
+
+if C_RisingWindowBullish and RisingWindowInput and rankBullishRisingWindow <= PerformanceRankInput
+    ttBullishRisingWindow = tagBullishRisingWindow
+    if CandleInfoInput == "Statistics"
+        ttBullishRisingWindow := ttBullishRisingWindow + "\n\n" + statBullishRisingWindow
+    if CandleInfoInput == "Description"
+        ttBullishRisingWindow := ttBullishRisingWindow + "\n\n" + descBullishRisingWindow
+    if CandleInfoInput == "Sources"
+        ttBullishRisingWindow := ttBullishRisingWindow + "\n\n" + "See: " + srcBullishRisingWindow
+    if CandleInfoInput == "All"
+        ttBullishRisingWindow := ttBullishRisingWindow + "\n\n" + statBullishRisingWindow + "\n\n" + descBullishRisingWindow + "\n\n" + "See: " + srcBullishRisingWindow
+
+    label.new(bar_index, patternLabelPosLow, text="RW", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishRisingWindow)
+alertcondition(C_RisingWindowBullish, title="Rising Window", message="New Rising Window - Bullish pattern detected.")
+
+
+// Spinning Top White
+C_SpinningTopWhiteNumberOfCandles = 1
+C_SpinningTopWhitePercent = 34.0
+C_IsSpinningTopWhite = C_DnShadow >= C_Range / 100 * C_SpinningTopWhitePercent and C_UpShadow >= C_Range / 100 * C_SpinningTopWhitePercent and not C_IsDojiBody
+C_SpinningTopWhite = C_IsSpinningTopWhite and C_WhiteBody ? true : false
+
+if C_SpinningTopWhite and SpinningTopWhiteInput and rankSpinningTopWhite <= PerformanceRankInput
+    ttSpinningTopWhite = tagSpinningTopWhite
+    if CandleInfoInput == "Statistics"
+        ttSpinningTopWhite := ttSpinningTopWhite + "\n\n" + statSpinningTopWhite
+    if CandleInfoInput == "Description"
+        ttSpinningTopWhite := ttSpinningTopWhite + "\n\n" + descSpinningTopWhite
+    if CandleInfoInput == "Sources"
+        ttSpinningTopWhite := ttSpinningTopWhite + "\n\n" + "See: " + srcSpinningTopWhite
+    if CandleInfoInput == "All"
+        ttSpinningTopWhite := ttSpinningTopWhite + "\n\n" + statSpinningTopWhite + "\n\n" + descSpinningTopWhite + "\n\n" + "See: " + srcSpinningTopWhite
+
+    label.new(bar_index, patternLabelPosLow, text="STW", style=label.style_label_up, color=color.gray, textcolor=color.white,    tooltip=ttSpinningTopWhite)
+alertcondition(C_SpinningTopWhite, title="Spinning Top White", message="New Spinning Top White pattern detected.")
+
+
+// Three White Soldiers Bullish
+C_ThreeWhiteSoldiersBullishNumberOfCandles = 3
+C_3WSld_ShadowPercent = 5.0
+C_3WSld_HaveNotUpShadow = C_Range * C_3WSld_ShadowPercent / 100 > C_UpShadow
+C_ThreeWhiteSoldiersBullish = false
+if C_LongBody and C_LongBody[1] and C_LongBody[2]
+    if C_WhiteBody and C_WhiteBody[1] and C_WhiteBody[2]
+        C_ThreeWhiteSoldiersBullish := close > close[1] and close[1] > close[2] and open < close[1] and open > open[1] and open[1] < close[2] and open[1] > open[2] and C_3WSld_HaveNotUpShadow and C_3WSld_HaveNotUpShadow[1] and C_3WSld_HaveNotUpShadow[2]
+
+if C_ThreeWhiteSoldiersBullish and ThreeWhiteSoldiersInput and rankBullishThreeWhiteSoldiers <= PerformanceRankInput
+    ttBullishThreeWhiteSoldiers = tagBullishThreeWhiteSoldiers
+    if CandleInfoInput == "Statistics"
+        ttBullishThreeWhiteSoldiers := ttBullishThreeWhiteSoldiers + "\n\n" + statBullishThreeWhiteSoldiers
+    if CandleInfoInput == "Description"
+        ttBullishThreeWhiteSoldiers := ttBullishThreeWhiteSoldiers + "\n\n" + descBullishThreeWhiteSoldiers
+    if CandleInfoInput == "Sources"
+        ttBullishThreeWhiteSoldiers := ttBullishThreeWhiteSoldiers + "\n\n" + "See: " + srcBullishThreeWhiteSoldiers
+    if CandleInfoInput == "All"
+        ttBullishThreeWhiteSoldiers := ttBullishThreeWhiteSoldiers + "\n\n" + statBullishThreeWhiteSoldiers + "\n\n" + descBullishThreeWhiteSoldiers + "\n\n" + "See: " + srcBullishThreeWhiteSoldiers
+
+    label.new(bar_index, patternLabelPosLow, text="3WS", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishThreeWhiteSoldiers)
+alertcondition(C_ThreeWhiteSoldiersBullish, title="Three White Soldiers", message="New Three White Soldiers - Bullish pattern detected.")
+
+
+// Tri Star Bullish
+C_TriStarBullishNumberOfCandles = 3
+C_3DojisBullish = C_Doji[2] and C_Doji[1] and C_Doji
+C_BodyGapUpBullish = C_BodyHi[1] < C_BodyLo
+C_BodyGapDnBullish = C_BodyLo[1] > C_BodyHi
+C_TriStarBullish = C_3DojisBullish and isDownTrend[2] and C_BodyGapDnBullish[1] and C_BodyGapUpBullish ? true : false
+
+if C_TriStarBullish and TriStarInput and rankBullishTriStar <= PerformanceRankInput
+    ttBullishTriStar = tagBullishTriStar
+    if CandleInfoInput == "Statistics"
+        ttBullishTriStar := ttBullishTriStar + "\n\n" + statBullishTriStar
+    if CandleInfoInput == "Description"
+        ttBullishTriStar := ttBullishTriStar + "\n\n" + descBullishTriStar
+    if CandleInfoInput == "Sources"
+        ttBullishTriStar := ttBullishTriStar + "\n\n" + "See: " + srcBullishTriStar
+    if CandleInfoInput == "All"
+        ttBullishTriStar := ttBullishTriStar + "\n\n" + statBullishTriStar + "\n\n" + descBullishTriStar + "\n\n" + "See: " + srcBullishTriStar
+
+    label.new(bar_index, patternLabelPosLow, text="3S", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishTriStar)
+alertcondition(C_TriStarBullish, title="Tri-Star", message="New Tri-Star - Bullish pattern detected.")
+
+
+// Tweezer Bottom Bullish
+C_TweezerBottomBullishNumberOfCandles = 2
+C_TweezerBottomBullish = isUpTrend[1] and (not C_IsDojiBody or (C_HasUpShadow and C_HasDnShadow)) and abs(low - low[1]) <= C_BodyAvg * 0.05 and C_BlackBody[1] and C_WhiteBody and C_LongBody[1] ? true : false
+
+if C_TweezerBottomBullish and TweezerBottomInput and rankBullishTweezerBottom <= PerformanceRankInput
+    ttBullishTweezerBottom = tagBullishTweezerBottom
+    if CandleInfoInput == "Statistics"
+        ttBullishTweezerBottom := ttBullishTweezerBottom + "\n\n" + statBullishTweezerBottom
+    if CandleInfoInput == "Description"
+        ttBullishTweezerBottom := ttBullishTweezerBottom + "\n\n" + descBullishTweezerBottom
+    if CandleInfoInput == "Sources"
+        ttBullishTweezerBottom := ttBullishTweezerBottom + "\n\n" + "See: " + srcBullishTweezerBottom
+    if CandleInfoInput == "All"
+        ttBullishTweezerBottom := ttBullishTweezerBottom + "\n\n" + statBullishTweezerBottom + "\n\n" + descBullishTweezerBottom + "\n\n" + "See: " + srcBullishTweezerBottom
+
+    label.new(bar_index, patternLabelPosLow, text="TB", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishTweezerBottom)
+alertcondition(C_TweezerBottomBullish, title="Tweezer Bottom", message="New Tweezer Bottom - Bullish pattern detected.")
+
+
+// Upside Tasuki Gap Bullish
+C_UpsideTasukiGapBullishNumberOfCandles = 3
+C_UpsideTasukiGapBullish = C_LongBody[2] and C_SmallBody[1] and isUpTrend and C_WhiteBody[2] and C_BodyLo[1] > C_BodyHi[2] and C_WhiteBody[1] and C_BlackBody and C_BodyLo >= C_BodyHi[2] and C_BodyLo <= C_BodyLo[1] ? true : false
+
+if C_UpsideTasukiGapBullish and UpsideTasukiGapInput and rankBullishUpsideTasukiGap <= PerformanceRankInput
+    ttBullishUpsideTasukiGap = tagBullishUpsideTasukiGap
+    if CandleInfoInput == "Statistics"
+        ttBullishUpsideTasukiGap := ttBullishUpsideTasukiGap + "\n\n" + statBullishUpsideTasukiGap
+    if CandleInfoInput == "Description"
+        ttBullishUpsideTasukiGap := ttBullishUpsideTasukiGap + "\n\n" + descBullishUpsideTasukiGap
+    if CandleInfoInput == "Sources"
+        ttBullishUpsideTasukiGap := ttBullishUpsideTasukiGap + "\n\n" + "See: " + srcBullishUpsideTasukiGap
+    if CandleInfoInput == "All"
+        ttBullishUpsideTasukiGap := ttBullishUpsideTasukiGap + "\n\n" + statBullishUpsideTasukiGap + "\n\n" + descBullishUpsideTasukiGap + "\n\n" + "See: " + srcBullishUpsideTasukiGap
+
+    label.new(bar_index, patternLabelPosLow, text="UTG", style=label.style_label_up, color=color.blue, textcolor=color.white, tooltip=ttBullishUpsideTasukiGap)
+alertcondition(C_UpsideTasukiGapBullish, title="Upside Tasuki Gap", message="New Upside Tasuki Gap - Bullish pattern detected.")
+

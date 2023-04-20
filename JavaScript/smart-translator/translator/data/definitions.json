@@ -1,0 +1,86 @@
+[
+  {
+    "pos":"verb",
+    "entry":[
+      
+      {
+        "gloss":"allow or enable to escape from confinement; set free.",
+        "definition_id":"m_en_us1284085.001",
+        "example":"the government announced that the prisoners would be released"
+      },
+      
+      {
+        "gloss":"allow (something) to move, act, or flow freely.",
+        "definition_id":"m_en_us1284085.005",
+        "example":"she released his arm and pushed him aside"
+      },
+      
+      {
+        "gloss":"allow (information) to be generally available.",
+        "definition_id":"m_en_us1284085.003",
+        "example":"no details about the contents of the talks were released"
+      },
+      
+      {
+        "gloss":"remit or discharge (a debt).",
+        "definition_id":"m_en_us1284085.008",
+        "example":"Mr. Libenstein further argues that if he is found personally liable, the liability was released by his discharge from bankruptcy."
+      }
+    ],
+    "base_form":"release"
+  }
+]
+
+================================================
+
+[
+  {
+    "pos":"noun",
+    "entry":[
+      {
+        "gloss":"a radio or television program or transmission.",
+	"definition_id":"m_en_us1228872.005",
+	"example":"Seychellois radio and television broadcasts offer programs in Creole, English, and French."
+      }
+    ],
+    "base_form":"broadcast"
+  },
+  {
+    "pos":"verb",
+    "entry":[
+      {
+        "gloss":"transmit (a program or some information) by radio or television.",
+	"definition_id":"m_en_us1228872.001",
+	"example":"the announcement was broadcast live"
+      },
+      {
+	"gloss":"scatter (seeds) by hand or machine rather than placing in drills or rows.",
+	"definition_id":"m_en_us1228872.004",
+	"example":"Seed is broadcast or drilled on the pastures in late winter or early spring."
+      }
+    ],
+    "base_form":"broadcast"
+  },
+  {
+    "pos":"adjective",
+    "entry":[
+      {
+	"gloss":"of or relating to radio or television transmission.",
+	"definition_id":"m_en_us1228872.006",
+	"example":"a broadcast journalist"
+      }
+    ],
+    "base_form":"broadcast"
+  },
+  {
+    "pos":"adverb",
+    "entry":[
+      {
+        "gloss":"by scattering.",
+	"definition_id":"m_en_us1228872.007",
+	"example":"green manure can be sown broadcast or in rows"
+      }
+    ],
+    "base_form":"broadcast"
+  }
+]
