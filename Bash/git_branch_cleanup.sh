@@ -1,5 +1,4 @@
 #!/bin/sh
-
 ## This script iterates over a list of the local branches in a given repository
 ## Each local and its corresponding remote branch can then be removed
 

@@ -103,7 +103,7 @@ Prints 'key=value' for each record in the database to STDOUT.
 
 =head1 AUTHOR
 
-Mariusz Kula <mariusz.kula@experian.com>
+Mariusz Kula <mkula.dev@gmail.com>
 
 
 

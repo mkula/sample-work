@@ -64,9 +64,9 @@ def list_children(dimension_id: int=None, company_id: int=None) -> list[str]:
     if dimension_id is None and company_id is None:
         raise ValueError(f"Invalid function arguments dimension_id, company_id: '{dimension_id}', '{company_id}'.")
     if dimension_id and not isinstance(dimension_id, int):
-        raise ValueError(f"Invalid dimension_id: '{dimension_id}'. Mus be of type int.")
+        raise TypeError(f"Invalid dimension_id: '{dimension_id}'. Mus be of type int.")
     if company_id and not isinstance(company_id, int):
-        raise ValueError(f"Invalid company_id: '{dimension_id}'. Must be of type int.")
+        raise TypeError(f"Invalid company_id: '{dimension_id}'. Must be of type int.")
 
 
     # validate function arguments
@@ -134,9 +134,9 @@ def list_children(dimension_id: int=None, company_id: int=None) -> list[str]:
             return branch
 
         if not isinstance(dimension_id, int) or dimension_id not in hierarchy_map:
-            raise ValueError(f"Invalid dimension id: '{dimension_id}'. Must be of type int.")
+            raise TypeError(f"Invalid dimension id: '{dimension_id}'. Must be of type int.")
         if not isinstance(level, int) or level < 0:
-            raise ValueError(f"Invalid level: '{level}'. Must be of type int.")
+            raise TypeError(f"Invalid level: '{level}'. Must be of type int.")
 
         indent = '\t' * level  # indent for a dimension
         branch.append(f'{indent}{dimension_map[dimension_id]}')
@@ -165,7 +165,7 @@ def list_hierarchy(company_id: int) -> list[str]:
     """ List the complete nested hierarchy for a company.
     """
     if not isinstance(company_id, int):
-        raise ValueError(f"Invalid company_id: '{company_id}'. Must be of type int.")
+        raise TypeError(f"Invalid company_id: '{company_id}'. Must be of type int.")
 
     return list_children(None, company_id)
 

@@ -4,7 +4,7 @@ The array index of an element is calculated with the following formula:
 i = hash(key) % (len(array) - 1)
 
 The formula may produce collisions where two distinct keys produce the same array index. To resolve this issue we can implement
-chaining (Perl implementation of hashes table implementation in Perl) or open addressing (dictionary implementation in Python).
+chaining (Perl implementation of hash tables) or open addressing (Python implementation of dictionaries).
 
 This implementation of a dictionary utilizes the chaining method for collision resolution, where elements with the same array index
 are grouped in a linked list.

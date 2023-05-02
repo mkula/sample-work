@@ -1,7 +1,7 @@
 #!/bin/sh
-
 ## This script simulates functionality of gotoSAID on TTB
-## But it changes directory to its git client repo equivalent 
+## But it changes directory to its git client repo equivalent
+
 user=$(whoami)
 
 if [ "X$1" == "X" ]

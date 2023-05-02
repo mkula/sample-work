@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# this script generates a mapping file of MID_WOSTART => ISSUE_ID that is then used in autoproc_run
+# this script generates a mapping file of MID_WOSTART => ISSUE_ID that is then used in autoproc
 # to map base64 ISSUE_ID to base64alt ISSUE_ID in the Omniture Event Exports before they are sent out to Omniture
 
 use strict;
@@ -29,20 +29,20 @@ my $delim             = "\t";
 
 # all client SAIDs
 my %client_saids = (
-  2068256120 => 1,
-  317107419  => 1,
-  2086124276 => 1,
-  2087824111 => 1,
-  2072019278 => 1,
-  2075682264 => 1,
-  2082073346 => 1,
-  268918197  => 1,
-  486466669  => 1,
-  281316078  => 1,
-  432634990  => 1,
-  310492949  => 1,
-  390067046  => 1,
-  2092877540 => 1,
+  REDACTED => 1,
+  REDACTED  => 1,
+  REDACTED => 1,
+  REDACTED => 1,
+  REDACTED => 1,
+  REDACTED => 1,
+  REDACTED => 1,
+  REDACTED  => 1,
+  REDACTED  => 1,
+  REDACTED  => 1,
+  REDACTED  => 1,
+  REDACTED  => 1,
+  REDACTED  => 1,
+  REDACTED => 1,
 );
 
 # get all AIDs for client SAIDs

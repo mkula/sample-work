@@ -8,7 +8,7 @@ class Company(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        raise Exception('Editing Dimensions is disabled for this assignment')
+        raise Exception('Editing Dimensions is disabled')
 
 
 class Dimension(models.Model):
@@ -24,4 +24,4 @@ class Dimension(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        raise Exception('Editing Dimensions is disabled for this assignment')
+        raise Exception('Editing Dimensions is disabled')

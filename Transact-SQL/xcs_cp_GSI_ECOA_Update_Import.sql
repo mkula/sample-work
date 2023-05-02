@@ -40,7 +40,7 @@ SET NOCOUNT ON
 -- Client: REDACTED
 -- CMS/DMS: REDACTED
 -- Time zone: EST
--- Ticket(s): https://jira.cheetahmail.com/browse/PS-15411
+-- Ticket(s): https://jira.cheetahmail.com/browse/REDACTED
 --
 -- As client's customers change their email addresses, a daily file of the changes gets loaded into a table called ECOA. The ECOA table is built specifically so that we can do an ECOA import stored procedure. 
 -- The ECOA table has three unique identifiers, and all three fields are provided to us in the daily file from the client:

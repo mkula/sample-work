@@ -37,7 +37,7 @@ BEGIN
 -- Client: REDACTED
 -- CMS/DMS: REDACTED
 -- Time zone: EST
--- Ticket(s): https://jira.cheetahmail.com/browse/PS-17556
+-- Ticket(s): https://jira.cheetahmail.com/browse/REDACTED
 --
 -- This is a campaign stored proc that gets attached to a campaign that sends promo codes to its audience.
 --

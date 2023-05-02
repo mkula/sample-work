@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION clientdev_get_email (p_said IN NUMBER, p_user_prof_id
   v_query     VARCHAR2(150);
 BEGIN
   --EXECUTE IMMEDIATE v_query INTO v_email USING IN p_said, IN p_user_prof_id;
-  --v_query := 'SELECT email FROM data_268918197 WHERE user_prof_id = :p_user_prof_id';
+  --v_query := 'SELECT email FROM data_REDACTED WHERE user_prof_id = :p_user_prof_id';
   --EXECUTE IMMEDIATE v_query INTO v_email USING IN p_user_prof_id;
   v_query := 'SELECT email INTO  FROM data_' || p_said || ' WHERE user_prof_id = ' || p_user_prof_id;
   v_cursor_id := DBMS_SQL.OPEN_CURSOR;

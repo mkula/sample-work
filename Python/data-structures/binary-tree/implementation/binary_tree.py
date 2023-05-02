@@ -224,26 +224,6 @@ class BinaryTree:
         # Recursive version
         return self.root.add(value)
 
-        # Non-recursive version
-        #node = self.root
-        #while node is not None:
-        #    # Traverse down the tree
-        #    print(node.value)
-        #    if value == node.value:
-        #        return True;
-        #    elif value < node.value:
-        #        if node.left is None:
-        #            node.left = Node(value)
-        #            return True
-        #        node = node.left
-        #    else:
-        #        if node.right is None:
-        #            node.right = Node(value)
-        #            return True
-        #        node = node.right
-        #
-        #return False
-
     def remove(self, value=None):
         if value is None:
             raise ValueError('Must pass a value to BinaryTree.remove()')
@@ -317,7 +297,6 @@ class BinaryTree:
         best = node
         distance = abs(node.value - value)
         while node:
-            print('{}'.format(node.value))
             if abs(node.value - value) < distance:
                 best = node
                 distance = abs(node.value - value)

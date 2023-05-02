@@ -9,11 +9,11 @@ Docker
 =======================
 The project has been dockerized (Dockerfile). Run the following commands to build the project image and run its container. 
 
-    $ cd take-home-assignment/rivet
+    $ cd rest-api/rivet
 
-    $ docker build -t rivet-rest-api .
+    $ docker build -t web .
 
-    $ docker run -ti -p 8000:8000 rivet-rest-api
+    $ docker run -ti -p 8000:8000 web
 
 
 API Endpoints
